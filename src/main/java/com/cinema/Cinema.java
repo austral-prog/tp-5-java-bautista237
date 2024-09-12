@@ -77,4 +77,70 @@ public class Cinema {
      * Busca las N butacas libres consecutivas en una fila. Si no hay, retorna null.
      *
      * @param row    fila en la que buscará las butacas.
-     * @param amount el número de butacas
+     * @param amount el número de butacas necesarias (N).
+     * @return La primer butaca de la serie de N butacas, si no hay retorna null.
+     */
+    public Seat getAvailableSeatsInRow(int row, int amount) {
+        if (row < 0 || row >= seats.length) {
+            return null;
+        }
+        Seat[] seatRow = seats[row];
+        int consecutive = 0;
+        Seat firstAvailable = null;
+        for (Seat seat : seatRow) {
+            if (seat.isAvailable()) {
+                if (consecutive == 0) {
+                    firstAvailable = seat;
+                }
+                consecutive++;
+                if (consecutive == amount) {
+                    return firstAvailable;
+                }
+            } else {
+                consecutive = 0;
+                firstAvailable = null;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Busca en toda la sala N butacas libres consecutivas. Si las encuentra
+     * retorna la primer butaca de la serie, si no retorna null.
+     *
+     * @param amount el número de butacas pedidas.
+     */
+    public Seat getAvailableSeats(int amount) {
+        for (int i = 0; i < seats.length; i++) {
+            Seat seat = getAvailableSeatsInRow(i, amount);
+            if (seat != null) {
+                return seat;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Marca como ocupadas la cantidad de butacas empezando por la que se le pasa.
+     *
+     * @param seat   butaca inicial de la serie.
+     * @param amount la cantidad de butacas a reservar.
+     */
+    public void takeSeats(Seat seat, int amount) {
+        for (int i = seat.getSeatNumber(); i < seat.getSeatNumber() + amount; i++) {
+            seats[seat.getRow()][i].takeSeat();
+        }
+    }
+
+    /**
+     * Libera la cantidad de butacas consecutivas empezando por la que se le pasa.
+     *
+     * @param seat   butaca inicial de la serie.
+     * @param amount la cantidad de butacas a liberar.
+     */
+    public void releaseSeats(Seat seat, int amount) {
+        for (int i = seat.getSeatNumber(); i < seat.getSeatNumber() + amount; i++) {
+            seats[seat.getRow()][i].releaseSeat();
+        }
+    }
+}
