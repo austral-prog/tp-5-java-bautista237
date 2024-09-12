@@ -1,44 +1,80 @@
 package com.cinema;
 
-/**
- * Clase que representa una butaca en el cine. Posee una fila y un lugar en la fila.
- * Se puede saber si está ocupada o no.
- */
-public class Seat {
+public class Cinema {
 
-    private int row;
-    private int seatNumber;
-    private boolean available = true;
+    private Seat[][] seats;
 
-    /** Construye butacas, para ello se le debe pasar su ubicación, representada por
-     * la fila y el número de asiento. */
-    public Seat(int row, int seatNumber) {
-        this.row = row;
-        this.seatNumber = seatNumber;
+    /**
+     * Construye una sala de cine. Se le pasa como dato un arreglo cuyo tamaño
+     * es la cantidad de filas y los enteros que tiene son el número de butacas en cada fila.
+     */
+    public Cinema(int[] rows) {
+        seats = new Seat[rows.length][];
+        initSeats(rows);
     }
 
-    /** Retorna el número de la fila. */
-    public int getRow() {
-        return row;
+    /**
+     * Inicializa las butacas de la sala de cine.
+     *
+     * @param rows arreglo que contiene la cantidad de butacas en cada fila
+     */
+    private void initSeats(int[] rows) {
+        for (int i = 0; i < rows.length; i++) {
+            seats[i] = new Seat[rows[i]];
+        }
+        for (int i = 0; i < seats.length; i++) {
+            for (int j = 0; j < seats[i].length; j++) {
+                seats[i][j] = new Seat(i, j);
+            }
+        }
     }
 
-    /** Retorna el número de asiento dentro de la fila. */
-    public int getSeatNumber() {
-        return seatNumber;
+    /**
+     * Cuenta la cantidad de butacas disponibles en el cine.
+     */
+    public int countAvailableSeats() {
+        int count = 0;
+        for (Seat[] row : seats) {
+            for (Seat seat : row) {
+                if (seat.isAvailable()) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
-    /** Retorna true si el asiento está disponible, o false en caso contrario. */
-    public boolean isAvailable() {
-        return available;
+    /**
+     * Busca la primera butaca libre dentro de una fila o null si no encuentra.
+     */
+    public Seat findFirstAvailableSeatInRow(int row) {
+        if (row < 0 || row >= seats.length) {
+            return null;
+        }
+        for (Seat seat : seats[row]) {
+            if (seat.isAvailable()) {
+                return seat;
+            }
+        }
+        return null;
     }
 
-    /** Ocupa el asiento. */
-    public void takeSeat() {
-        available = false;
+    /**
+     * Busca la primera butaca libre o null si no encuentra.
+     */
+    public Seat findFirstAvailableSeat() {
+        for (Seat[] row : seats) {
+            for (Seat seat : row) {
+                if (seat.isAvailable()) {
+                    return seat;
+                }
+            }
+        }
+        return null;
     }
 
-    /** Desocupa el asiento. */
-    public void releaseSeat() {
-        available = true;
-    }
-}
+    /**
+     * Busca las N butacas libres consecutivas en una fila. Si no hay, retorna null.
+     *
+     * @param row    fila en la que buscará las butacas.
+     * @param amount el número de butacas
